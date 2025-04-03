@@ -366,6 +366,12 @@
     gap: 0.25ch;
   }
 
+  .card__assignees {
+    .avatar:last-of-type {
+      margin-inline-end: 0.5ch;
+    }
+  }
+
   .card__meta {
     display: grid;
     font-size: 1em;
