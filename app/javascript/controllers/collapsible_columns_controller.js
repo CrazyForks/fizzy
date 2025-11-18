@@ -3,19 +3,20 @@ import { nextFrame, debounce } from "helpers/timing_helpers";
 
 export default class extends Controller {
   static classes = [ "collapsed", "noTransitions", "titleNotVisible" ]
-  static targets = [ "column", "button", "title", "focusElement" ]
+  static targets = [ "column", "button", "title", "focusElement", "maybe" ]
   static values = {
     board: String
   }
 
   initialize() {
     this.restoreState = debounce(this.restoreState.bind(this), 10)
+    this.currentColumnIndex = 1
+    this.#setColumnFocus(1)
   }
 
   async connect() {
     await this.#restoreColumnsDisablingTransitions()
     this.#setupIntersectionObserver()
-    this.focusElement.target.focus()
   }
 
   disconnect() {
@@ -27,13 +28,17 @@ export default class extends Controller {
 
   toggle({ target }) {
     const column = target.closest('[data-collapsible-columns-target="column"]')
-    this.#toggleColumn(column);
+    this.#toggleColumn(column)
   }
 
   preventToggle(event) {
     if (event.target.hasAttribute("data-collapsible-columns-target") && event.detail.attributeName === "class") {
       event.preventDefault()
     }
+  }
+
+  navigate(event) {
+    this.#keyHandlers[event.key]?.call(this, event)
   }
 
   async restoreState(event) {
@@ -68,6 +73,7 @@ export default class extends Controller {
   }
 
   #collapseAllExcept(clickedColumn) {
+    console.log(clickedColumn)
     this.columnTargets.forEach(column => {
       if (column !== clickedColumn) {
         this.#collapse(column)
@@ -133,5 +139,49 @@ export default class extends Controller {
     }, { threshold: [0] })
 
     this.titleTargets.forEach(title => this._intersectionObserver.observe(title))
+  }
+
+  #keyHandlers = {
+    ArrowRight(event) {
+      this.#handleArrowKey(event, this.#selectNext.bind(this), false)
+    },
+    ArrowLeft(event) {
+      this.#handleArrowKey(event, this.#selectPrevious.bind(this), false)
+    }
+  }
+
+  #handleArrowKey(event, fn, preventDefault = true) {
+    if (event.shiftKey || event.metaKey || event.ctrlKey) { return }
+    fn.call()
+    if (preventDefault) { event.preventDefault() }
+  }
+
+  #selectPrevious() {
+    if (this.currentColumnIndex > 0) {
+      this.currentColumnIndex -= 1
+      this.#setColumnFocus(this.currentColumnIndex)
+    }
+  }
+
+  #selectNext() {
+    if (this.currentColumnIndex < this.allColumns.length - 1) {
+      this.currentColumnIndex += 1
+      this.#setColumnFocus(this.currentColumnIndex)
+    }
+  }
+
+  #setColumnFocus(index) {
+    const column = this.allColumns[index]
+    const focusElement = column.querySelector('[data-collapsible-columns-target="focusElement"]')
+
+    if (this.#isCollapsed(column)) {
+      this.#toggleColumn(column)
+    }
+
+    focusElement.focus()
+  }
+
+  get allColumns() {
+    return [ ...this.columnTargets.slice(0, 1), this.maybeTarget, ...this.columnTargets.slice(1) ]
   }
 }

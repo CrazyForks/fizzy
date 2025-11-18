@@ -7,6 +7,7 @@
       collapsible_columns_no_transitions_class: "no-transitions",
       collapsible_columns_title_not_visible_class: "is-off-screen",
       action: "
+        keydown@document->collapsible-columns#navigate
         dragstart->drag-and-drop#dragStart
         dragover->drag-and-drop#dragOver
         dragenter->drag-and-strum#dragEnter

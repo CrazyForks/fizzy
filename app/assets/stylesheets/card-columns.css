@@ -132,7 +132,7 @@
     translate: 0;
     transition: translate var(--column-transition-duration) var(--ease-out-overshoot-subtle);
 
-    .is-collapsed:not(.cards--considering) & {
+    .is-collapsed:not(.cards--maybe) & {
       translate: 0 var(--column-width-collapsed);
     }
 
@@ -347,7 +347,7 @@
       justify-content: center;
     }
 
-    .cards:is(.cards--considering) &:hover {
+    .cards:is(.cards--maybe) &:hover {
       cursor: unset;
       filter: none;
     }
@@ -375,7 +375,7 @@
       writing-mode: vertical-rl;
     }
 
-    .cards:not(.is-collapsed, .cards--considering) & {
+    .cards:not(.is-collapsed, .cards--maybe) & {
       align-items: center;
       display: flex;
       gap: 0.25ch;
@@ -405,7 +405,7 @@
     box-shadow: none !important;
     color: color-mix(in srgb, var(--card-color) 70%, var(--color-canvas));
 
-    .cards--considering & {
+    .cards--maybe & {
       background-color: var(--card-bg-color) !important;
     }
 
@@ -546,7 +546,7 @@
   /* Considering
   /* ------------------------------------------------------------------------ */
 
-  .cards--considering {
+  .cards--maybe {
     --card-color: oklch(var(--lch-blue-medium));
 
     position: relative;
@@ -676,7 +676,7 @@
   /* -------------------------------------------------------------------------- */
 
   /* Surface a mini bubble if there are cards with bubbles inside */
-  .cards--considering:has(.bubble:not([hidden])),
+  .cards--maybe:has(.bubble:not([hidden])),
   .cards--doing.is-collapsed:has(.bubble:not([hidden])) {
     .cards__transition-container {
       --bubble-color: var(--card-color, oklch(var(--lch-blue-medium)));
@@ -699,7 +699,7 @@
     }
   }
 
-  .cards--considering:has(.bubble:not([hidden])) .cards__expander-title:before {
+  .cards--maybe:has(.bubble:not([hidden])) .cards__expander-title:before {
     translate: 120% 50%;
   }
 
